@@ -6,6 +6,8 @@ import { ProductService } from '../product.service';
 import { Store, select } from '@ngrx/store';
 import * as fromProduct from '../state/product.reducer';
 import * as productActions from '../state/product.actions';
+import { takeWhile } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'pm-product-list',
@@ -14,14 +16,18 @@ import * as productActions from '../state/product.actions';
 })
 export class ProductListComponent implements OnInit, OnDestroy {
   pageTitle = 'Products';
-  errorMessage: string;
+  // errorMessage: string;
 
   displayCode: boolean;
 
   products: Product[];
+  componentActive = true;
 
   // Used to highlight the selected product in the list
   selectedProduct: Product | null;
+  errorMessage$: Observable<string>;
+  products$: Observable<Product[]>;
+ 
 
   constructor(private store: Store<fromProduct.State>,
     private productService: ProductService) { }
@@ -32,10 +38,18 @@ export class ProductListComponent implements OnInit, OnDestroy {
       currentProduct => this.selectedProduct = currentProduct
     );
 
-    this.productService.getProducts().subscribe(
-      (products: Product[]) => this.products = products,
-      (err: any) => this.errorMessage = err.error
-    );
+    this.errorMessage$ = this.store.pipe(select(fromProduct.getError));
+    this.store.dispatch(new productActions.Load());
+    this.products$ = this.store.pipe(select(fromProduct.getProducts)
+    // , takeWhile(() => this.componentActive)
+  );
+     // .subscribe((products: Product[]) => this.products = products);
+    // this.productService.getProducts().subscribe(
+    //   (products: Product[]) => this.products = products,
+    //   (err: any) => this.errorMessage = err.error
+    // );
+
+
     // TODO: Unsubscribe
     this.store.pipe(select(fromProduct.getShowProductCode)).subscribe(
       showProductCode => this.displayCode = showProductCode
@@ -43,6 +57,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.componentActive = false;
   }
 
   checkChanged(value: boolean): void {
