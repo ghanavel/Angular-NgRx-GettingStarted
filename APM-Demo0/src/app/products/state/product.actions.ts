@@ -1,6 +1,5 @@
 import { Action } from '@ngrx/store';
 import { Product } from '../product';
-import { LoadChildren } from '@angular/router';
 
 
 export enum ProductionActionTypes {
@@ -10,7 +9,11 @@ export enum ProductionActionTypes {
  InitialzieCurrentProduct = '[Product] initialzie current product code',
  Load = '[Product] Load',
  LoadSuccess = '[Product] Load success',
- LoadFail = '[Product] Load fail'
+ LoadFail = '[Product] Load fail',
+ UpdateProduct = '[Product] Update product',
+ UpdateProductSuccess = '[Product] Update product success',
+ UpdateProductFail = '[Product] Update product fail'
+
 }
 
 export class ToggleProductCode implements Action {
@@ -49,7 +52,20 @@ export class LoadFail implements Action {
     constructor(public payload: string) {}
 }
 
+export class UpdateProduct implements Action {
+    readonly type =  ProductionActionTypes.UpdateProduct;
+    constructor(public payload: Product) {}
+}
 
+export class UpdateProductSuccess implements Action {
+    readonly type =  ProductionActionTypes.UpdateProductSuccess;
+    constructor(public payload: Product) {}
+}
+
+export class UpdateProductFail implements Action {
+    readonly type =  ProductionActionTypes.UpdateProductFail;
+    constructor(public payload: string) {}
+}
 
 export type ProductActions = ToggleProductCode
  | SetCurrentProduct
@@ -57,4 +73,7 @@ export type ProductActions = ToggleProductCode
  | InitialzieCurrentProduct
  | Load
  | LoadSuccess
- | LoadFail;
+ | LoadFail
+ | UpdateProduct
+ | UpdateProductSuccess
+ | UpdateProductFail;
